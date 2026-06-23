@@ -1,9 +1,13 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:dart_levenshtein/dart_levenshtein.dart';
+// import 'package:dart_levenshtein/dart_levenshtein.dart'; // usar para mejorar the similarity check
 import 'package:flutter/material.dart';
 import 'package:happyblindglish/models/palabra.dart';
 import 'package:happyblindglish/providers/db_provider.dart';
+import 'package:logger/logger.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:flutter_tts/flutter_tts.dart';
+
+final logger = Logger();
 
 class LeccionButton extends StatefulWidget {
   final void Function()? onPressed;
@@ -25,7 +29,7 @@ void _playSound(AssetSource sound) async {
   try {
     await _audioPlayer.play(sound);
   } catch (e) {
-    print("Error al reproducir sonido: $e");
+    logger.i("Error al reproducir sonido: $e");
   }
 }
 
@@ -36,30 +40,49 @@ class _LeccionButtonState extends State<LeccionButton> {
   final stt.SpeechToText _speechToText = stt.SpeechToText();
   final AudioPlayer _audioPlayer = AudioPlayer();
   final db = DatabaseProvider();
+  final FlutterTts _flutterTts = FlutterTts();  
+  final FocusNode _focusNode = FocusNode(); 
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus) {
+        _pronunciarPalabra();
+      }
+    });
+  }
+
+  Future<void> _pronunciarPalabra() async {
+    await _flutterTts.setLanguage("en-US");
+    await _flutterTts.setSpeechRate(0.4);
+    await _flutterTts.speak(widget.palabra.palabraIngles);
+  }
+
   void _startListening() async {
     final targetWord = widget.palabra.palabraIngles.toLowerCase().trim();
     const double similarityThreshold = 0.3; // Ajusta el umbral según tolerancia
 
     if (await _speechToText.initialize()) {
-      print("SpeechToText inicializado correctamente.");
+      logger.i("SpeechToText inicializado correctamente.");
 
       _speechToText.listen(
         onResult: (result) async {
-          print(result.alternates);
+          logger.i(result.alternates);
           if (!result.finalResult) return; // Esperar a que termine de hablar
 
           String recognizedPhrase = result.recognizedWords.toLowerCase().trim();
-          print("Frase reconocida: $recognizedPhrase");
+          logger.i("Frase reconocida: $recognizedPhrase");
 
           List<String> wordsInPhrase =
               recognizedPhrase.split(" "); // Separar en palabras
-          print("Palabras separadas: $wordsInPhrase");
+          logger.i("Palabras separadas: $wordsInPhrase");
 
           bool esCorrecto = false;
 
           for (var word in wordsInPhrase) {
             double similarity = jaccardSimilarity(word, targetWord);
-            print(
+            logger.i(
                 "Comparando '$word' con '$targetWord' - Similaridad: $similarity");
 
             if (similarity >= similarityThreshold) {
@@ -70,7 +93,7 @@ class _LeccionButtonState extends State<LeccionButton> {
 
           if (esCorrecto) {
             _playSound(AssetSource("sonidos/assert.mp3"));
-            print("Palabra reconocida correctamente. Marcando como aprendida.");
+            logger.i("Palabra reconocida correctamente. Marcando como aprendida.");
             Palabra nuevaPalabra = Palabra(
               palabraEspanol: widget.palabra.palabraEspanol,
               palabraIngles: widget.palabra.palabraIngles,
@@ -80,10 +103,10 @@ class _LeccionButtonState extends State<LeccionButton> {
             );
             await db.updatePalabra(
                 nuevaPalabra.palabraEspanol, nuevaPalabra.toMap());
-            print(widget.palabra);
+            logger.i(widget.palabra);
             widget.onCorrectPronunciation!(nuevaPalabra);
           } else {
-            print("Palabra incorrecta.");
+            logger.i("Palabra incorrecta.");
             _playSound(AssetSource("sonidos/wrong.mp3"));
           }
           _speechToText.stop();
@@ -92,7 +115,7 @@ class _LeccionButtonState extends State<LeccionButton> {
         localeId: "en-US",
       );
     } else {
-      print("Error al inicializar SpeechToText.");
+      logger.i("Error al inicializar SpeechToText.");
     }
   }
 
@@ -108,44 +131,45 @@ class _LeccionButtonState extends State<LeccionButton> {
 
   @override
   void dispose() {
+    _focusNode.dispose();
+    _flutterTts.stop();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: "${widget.palabra.palabraEspanol}.Presiona para traducir a inglés",
-      child: GestureDetector(
-        onTap: widget.onPressed,
-        child: Container(
-          color: Colors.indigo,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width / 2,
-                child: Semantics(
-                  excludeSemantics: true,
-                  child: Text(
-                    widget.palabra.palabraEspanol,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+    return Focus(
+      focusNode: _focusNode,
+      child: Semantics(
+        label: "${widget.palabra.palabraEspanol}."
+               "Toca una vez para escuchar la pronunciación en inglés."
+               "Mantén presionado para pronunciar con tu voz.",
+        child: GestureDetector(
+          excludeFromSemantics: true,
+          onTap: _pronunciarPalabra,
+          onLongPress: _startListening,
+          child: Container(
+            color: Colors.indigo,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 2,
+                  child: Semantics(
+                    excludeSemantics: true,
+                    child: Text(
+                      widget.palabra.palabraEspanol,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
-              ),
-              IconButton(
-                color: Colors.white,
-                onPressed: _startListening,
-                icon: Semantics(
-                  label: "Pronunciar con tu voz",
-                  child: const Icon(Icons.mic),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

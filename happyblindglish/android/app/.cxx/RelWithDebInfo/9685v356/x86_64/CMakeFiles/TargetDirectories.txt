@@ -1,0 +1,2 @@
+C:/Users/Ana Meza/HappyBlindglish/happyblindglish/android/app/.cxx/RelWithDebInfo/9685v356/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/Ana Meza/HappyBlindglish/happyblindglish/android/app/.cxx/RelWithDebInfo/9685v356/x86_64/CMakeFiles/rebuild_cache.dir

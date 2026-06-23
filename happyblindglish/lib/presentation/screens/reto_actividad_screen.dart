@@ -8,9 +8,12 @@ import 'package:happyblindglish/models/palabra.dart';
 import 'package:happyblindglish/models/pregunta_respuestas.dart';
 import 'package:happyblindglish/models/reto.dart';
 import 'package:happyblindglish/presentation/blocs/reto_cubit.dart';
+import 'package:logger/logger.dart';
 import 'package:happyblindglish/utils/constants.dart';
 import 'package:happyblindglish/widgets/custom_button_2.dart';
 import 'package:happyblindglish/widgets/translated_button.dart';
+
+final logger = Logger();
 
 class RetoActividadScreen extends StatefulWidget {
   const RetoActividadScreen({super.key});
@@ -96,7 +99,7 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
     try {
       await _audioPlayer.play(sound);
     } catch (e) {
-      print("Error al reproducir sonido: $e");
+      logger.i("Error al reproducir sonido: $e");
     }
   }
 
