@@ -53,7 +53,7 @@ class _TranslatedButtonState extends State<TranslatedButton> {
   Future<void> _speakNormal() async {
     await _stopSpeech();
     await _flutterTts.setLanguage("en-US");
-    await _flutterTts.setSpeechRate(0.6); // Velocidad normal
+    await _flutterTts.setSpeechRate(0.5); // Velocidad normal
     await _flutterTts.speak(widget.text);
   }
 
@@ -107,7 +107,6 @@ class _TranslatedButtonState extends State<TranslatedButton> {
     return Focus(
       focusNode: _focusNode,
       child: Semantics(
-        button: true,
         label: "${widget.text}. Toca para escuchar.",
         onTap: () {
           _speakNormal();

@@ -292,18 +292,17 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
             Text(
               'Cómo responder:', 
               style: TextStyle(
-                fontSize: 13,
+                fontSize: 16,
                 fontWeight: FontWeight.bold, 
                 color: Colors.black
               )
             ),
             SizedBox(height: 4),
             Text(
-              "• Toca una vez para escuchar la palabra\n"
-              "• Toca dos veces para seleccionar como respuesta\n"
-              "• Mantén presionado para escuchar letra por letra",
+              "• Toca una vez para escuchar la palabra.\n"
+              "• Mantén presionado para pronunciar la palabra.\n",
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 15,
                 color: Colors.black,
                 height: 1.6,
               ),
@@ -351,31 +350,29 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
         .take(_wordsPerPage)
         .toList();
 
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.5,
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: wordsToDisplay.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: LeccionButton(
-              onPressed: () =>
-                  _speakSlowly(wordsToDisplay[index].palabraIngles),
-              palabra: wordsToDisplay[index],
-              onCorrectPronunciation: (learnedWord) {
-                if (!showLearnedWords) {
-                  setState(() {
-                    palabrasLeccion.remove(wordsToDisplay[index]);
-                    palabrasLeccion.add(learnedWord);
-                    _updateFilteredWords(); // Recalcular palabras y páginas
-                  });
-                }
-              },
-            ),
-          );
-        },
-      ),
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: wordsToDisplay.length,
+      itemBuilder: (context, index) {
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: LeccionButton(
+            onPressed: () =>
+                _speakSlowly(wordsToDisplay[index].palabraIngles),
+            palabra: wordsToDisplay[index],
+            onCorrectPronunciation: (learnedWord) {
+              if (!showLearnedWords) {
+                setState(() {
+                  palabrasLeccion.remove(wordsToDisplay[index]);
+                  palabrasLeccion.add(learnedWord);
+                  _updateFilteredWords(); // Recalcular palabras y páginas
+                });
+              }
+            },
+          ),
+        );
+      },
     );
   }
 

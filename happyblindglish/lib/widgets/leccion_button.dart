@@ -153,27 +153,53 @@ class _LeccionButtonState extends State<LeccionButton> {
         child: GestureDetector(
           onTap: _pronunciarPalabra,
           onLongPress: _startListening,
-          child: Container(
-            color: Colors.indigo,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: MediaQuery.of(context).size.width / 2,
-                  child: Semantics(
-                    excludeSemantics: true,
-                    child: Text(
-                      widget.palabra.palabraEspanol,
-                      style: const TextStyle(
-                        fontSize: 20,
+          child: Center(
+            child: Card(
+              elevation: 8,
+              color: Colors.indigo,
+              margin: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.05,
+                vertical: 16,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(
+                  MediaQuery.of(context).size.width * 0.08,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.palabra.palabraIngles,
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width * 0.14,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
                       textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.02,
+                    ),
+                    Text(
+                      widget.palabra.palabraEspanol,
+                      style: TextStyle(
+                        fontSize: MediaQuery.of(context).size.width * 0.08,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.yellow,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

@@ -204,28 +204,7 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                   // Instrucciones siempre visibles
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-                    child: Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey.shade400),
-                      ),
-                      padding: const EdgeInsets.all(12),
-                      child: const Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Cómo responder para personas sin lector de pantalla:', style: TextStyle(fontWeight: FontWeight.bold)),
-                          SizedBox(height: 8),
-                          Text('• Toca una vez para escuchar'),
-                          Text('• Toca dos veces para seleccionar como respuesta'),
-                          Text('• Mantén presionado para escuchar letra por letra'),
-                        ],
-                      ),
-                    ),
-                  ),
+                  _buildInstructions(),
                   
                   Semantics(
                     child: Text(
@@ -361,3 +340,42 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
     );
   }
 }
+
+Widget _buildInstructions() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade400),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Cómo responder para personas lin lector de pantalla:', 
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold, 
+                color: Colors.black
+              )
+            ),
+            SizedBox(height: 4),
+            Text(
+              "• Toca una vez para escuchar.\n"
+              "• Toca dos veces para seleccionar como respuesta.\n"
+              "• Mantén presionado para escuchar letra por letra.",
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.black,
+                height: 1.6,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
