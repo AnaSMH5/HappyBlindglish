@@ -71,8 +71,12 @@ class _RetosDelDiaScreenState extends State<RetosDelDiaScreen> {
         view: retosDelDia.isNotEmpty
             ? Column(
                 children: [
-                  Text(
-                      "$numeroRetosCompletados de $numInicialDeRetos retos completados"),
+                  Semantics(
+                    label:
+                        "$numeroRetosCompletados de $numInicialDeRetos retos completados",
+                    child: Text(
+                        "$numeroRetosCompletados de $numInicialDeRetos retos completados"),
+                  ),
                   Container(
                     color: AppUtils.generalBackground,
                     height: MediaQuery.of(context).size.height / 1.5,
@@ -102,9 +106,16 @@ class _RetosDelDiaScreenState extends State<RetosDelDiaScreen> {
             : Center(
                 child: Column(
                   children: [
-                    Text(
-                        "$numeroRetosCompletados de $numInicialDeRetos retos completados"),
-                    const Text("No hay más retos hoy"),
+                    Semantics(
+                      label:
+                          "$numeroRetosCompletados de $numInicialDeRetos retos completados",
+                      child: Text(
+                          "$numeroRetosCompletados de $numInicialDeRetos retos completados"),
+                    ),
+                    Semantics(
+                      label: 'No hay más retos hoy',
+                      child: const Text("No hay más retos hoy"),
+                    ),
                   ],
                 ),
               ),
@@ -132,6 +143,9 @@ class ChallengeCard extends StatelessWidget {
         child: Card(
           surfaceTintColor: const Color(0xffffffff),
           child: Semantics(
+            button: true,
+            label:
+                "Reto de ${reto.tema}, acierta ${reto.datosReto.palabrasPorAprender} palabras en inglés",
             child: ListTile(
               title: Text(
                   "Acierta ${reto.datosReto.palabrasPorAprender} ${reto.tema} en inglés"),

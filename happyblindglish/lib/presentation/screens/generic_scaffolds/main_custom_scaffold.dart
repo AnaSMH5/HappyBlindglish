@@ -61,7 +61,7 @@ class _MainCustomScaffoldState extends State<MainCustomScaffold> {
                         context: context,
                         builder: (context) {
                           return AlertDialog(
-                            title: const Text("Dialogo de ayuda"),
+                            title: const Text("Diálogo de ayuda"),
                             content: Text(widget.tutorialText),
                             actions: [
                               GestureDetector(

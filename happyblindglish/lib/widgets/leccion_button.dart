@@ -141,11 +141,16 @@ class _LeccionButtonState extends State<LeccionButton> {
     return Focus(
       focusNode: _focusNode,
       child: Semantics(
-        label: "${widget.palabra.palabraEspanol}."
-               "Toca una vez para escuchar la pronunciación en inglés."
-               "Mantén presionado para pronunciar con tu voz.",
+        button: true,
+        label:
+            "${widget.palabra.palabraEspanol} Toca para escuchar y mantén presionado para practicar pronunciación",
+        onTap: () {
+          _pronunciarPalabra();
+        },
+        onLongPress: () {
+          _startListening();
+        },
         child: GestureDetector(
-          excludeFromSemantics: true,
           onTap: _pronunciarPalabra,
           onLongPress: _startListening,
           child: Container(

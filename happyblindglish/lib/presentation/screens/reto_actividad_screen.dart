@@ -139,8 +139,54 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: Text("Puntaje: $puntosGanados acumulados"),
-        backgroundColor: Colors.amber,
-        automaticallyImplyLeading: false,
+        actions: [
+          Semantics(
+            label: "Botón de ayuda",
+            button: true,
+            child: IconButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text("¿Cómo responder?"),
+                      content: const Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Sin lector de pantalla:",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 4),
+                          Text("• Toca una vez para escuchar la palabra"),
+                          Text("• Toca dos veces para seleccionar como respuesta"),
+                          Text("• Mantén presionado para escuchar letra por letra"),
+                          SizedBox(height: 12),
+                          Text(
+                            "Con lector de pantalla:",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 4),
+                          Text("• La palabra se pronuncia automáticamente al llegar a ella"),
+                          Text("• Escucha lo que dice tu sistema y sigue las intrucciones para ver más acciones"),
+                          Text("• Puedes elegir entre: 'Seleccionar como respuesta', 'Escuchar pronunciación lenta' o 'Escuchar letra por letra'"),
+                        ],
+                      ),
+                      actions: [
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: const Text("Cerrar"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+              icon: const Icon(Icons.help),
+            ),
+          ),
+        ],
       ),
       body: BlocBuilder<RetoCubit, Reto?>(
         builder: (context, state) {
@@ -152,10 +198,35 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
           }
           return Semantics(
             excludeSemantics: blockUI,
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+            child: SingleChildScrollView(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                  // Instrucciones siempre visibles
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade400),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Cómo responder para personas sin lector de pantalla:', style: TextStyle(fontWeight: FontWeight.bold)),
+                          SizedBox(height: 8),
+                          Text('• Toca una vez para escuchar'),
+                          Text('• Toca dos veces para seleccionar como respuesta'),
+                          Text('• Mantén presionado para escuchar letra por letra'),
+                        ],
+                      ),
+                    ),
+                  ),
+                  
                   Semantics(
                     child: Text(
                       "Pregunta ${_indicePregunta + 1} de ${selectedReto.datosReto.palabrasPorAprender}",
@@ -183,8 +254,10 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
                       ),
                     ],
                   ),
+
                   ListView.builder(
                     shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
                     itemCount: preguntas[_indicePregunta].respuestas.length,
                     semanticChildCount: preguntas[_indicePregunta]
                         .respuestas
@@ -278,7 +351,8 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
                     },
                     text: Strings.terminarActividad,
                   )
-                ],
+                  ],
+                ),
               ),
             ),
           );

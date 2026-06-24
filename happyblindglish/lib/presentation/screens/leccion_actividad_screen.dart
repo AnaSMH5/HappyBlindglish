@@ -30,8 +30,9 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
   int maxPage = 0;
   bool firstTime = true;
   int _currentPage = 0;
-  static const int _wordsPerPage = 4; // Cambio aquí, de 5 a 4
+  static const int _wordsPerPage = 1; // Una palabra por página
   bool showLearnedWords = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -76,12 +77,18 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
     final db = DatabaseProvider();
     selectedLeccion = context.read<LeccionCubit>().state!;
     db
-        .getAllPalabrasByTheme(
-            selectedLeccion.tema, selectedLeccion.dificultad!)
-        .then((value) {
+    .getAllPalabrasByTheme(
+      selectedLeccion.tema, selectedLeccion.dificultad!)
+    .then((value) {
+      palabrasLeccion = value.map((map) => Palabra.fromMap(map)).toList();
+      _updateFilteredWords();
+    }).catchError((error) {
+    // Si hay un error, dejamos de mostrar el estado de carga
+      debugPrint('Error cargando palabras: $error');
+    }).whenComplete(() {
+      if (!mounted) return;
       setState(() {
-        palabrasLeccion = value.map((map) => Palabra.fromMap(map)).toList();
-        _updateFilteredWords();
+        _isLoading = false;
       });
     });
   }
@@ -132,13 +139,14 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
         .toList();
 
     // Calcular el valor máximo de la página según el filtro
-    setState(() {
-      maxPage = (currentWords.length / _wordsPerPage).ceil() - 1;
-    });
+    maxPage = (currentWords.length / _wordsPerPage).ceil() - 1;
 
-    // Reiniciar la página actual si es necesario
+    // Ajustar la página actual si es necesario
     if (_currentPage > maxPage) {
       _currentPage = maxPage;
+    }
+    if (_currentPage < 0) {
+      _currentPage = 0;
     }
   }
 
@@ -180,31 +188,25 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
       appBar: AppBar(
         actions: [
           Semantics(
-            excludeSemantics: true,
-            label: "Boton de ayuda",
+            label: "Botón de ayuda",
             button: false,
             child: IconButton(
               onPressed: () {
                 showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Dialogo de instrucciones"),
-                        content: const Column(
-                          children: [
-                            Text(
-                                "En esta lección, aprenderás palabras basicas. Para salir podrás usar el botón de 'Terminar actividad' ubicado en la zona baja de la pantalla."),
-                            Text("Navega por cada palabra de la lista."),
-                            Text(
-                                "Cada palabra está contenida en un cuadro con 2 acciones"),
-                            Text(
-                                "Traducir palabra: esta se activa presionando la opción una vez"),
-                            Text(
-                                "Pronunciar con tu voz: esta se activa presionando la opción dentro de cada palabra"),
-                            Text(
-                                "Si pronuncias la palabra correctamente, la palabra se completará como aprendida y desaparecerá de la lista"),
-                            Text(
-                                "Continúa aprendiendo para ir subiendo de nivel y enfrentar desafíos más grandes")
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text('Instrucciones'),
+                      content: const Column(
+                        children: [
+                          Text("En esta lección, aprenderás palabras básicas."
+                               "Para salir podrás usar el botón de 'Terminar actividad' ubicado en la zona baja de la pantalla."),
+                          Text("Cada palabra está contenida en un cuadro con 2 acciones."),
+                          Text("Traducir palabra: esta se activa tocando la palabra una vez."),
+                          Text("Pronunciar con tu voz: esta se activa manteniendo presionada la palabra"),
+                          Text("Con esta opción debes pronunciar la palabra en voz alta."
+                               "Si pronuncias la palabra correctamente, la palabra se completará como aprendida y desaparecerá de la lista"),
+                          Text("Si quieres conocer las palabras que ya aprendiste, toca el botón de 'Repasar y mostrar palabras aprendidas'"),
                           ],
                         ),
                         actions: [
@@ -214,7 +216,8 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
                           )
                         ],
                       );
-                    });
+                    }
+                  );
               },
               icon: const Icon(Icons.help),
             ),
@@ -233,6 +236,7 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  _buildInstructions(),
                   _buildToggleButton(), // Usando el botón único
                   _buildWordList(),
                   _buildNavigationRow(),
@@ -271,7 +275,59 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
     );
   }
 
+  Widget _buildInstructions() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade400),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Cómo responder:', 
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold, 
+                color: Colors.black
+              )
+            ),
+            SizedBox(height: 4),
+            Text(
+              "• Toca una vez para escuchar la palabra\n"
+              "• Toca dos veces para seleccionar como respuesta\n"
+              "• Mantén presionado para escuchar letra por letra",
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.black,
+                height: 1.6,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildWordList() {
+    // Verificar si aún se están cargando las palabras
+    if (_isLoading) {
+      return const Padding(
+        padding: EdgeInsets.only(top: 150, bottom: 150),
+        child: Center(
+          child: Text(
+            'Cargando palabras...',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+      );
+    }
+
     // Verificar si hay palabras disponibles antes de continuar con la paginación
     if (currentWords.isEmpty) {
       return Padding(
