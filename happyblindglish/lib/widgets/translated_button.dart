@@ -84,8 +84,8 @@ class _TranslatedButtonState extends State<TranslatedButton> {
       
       // Espera a que termine de pronunciar la letra
       await completer.future.timeout(
-        const Duration(seconds: 2),
-        onTimeout: () {}, // si tarda más de 2s pasa a la siguiente
+        const Duration(seconds: 4),
+        onTimeout: () {}, // si tarda más de 4s pasa a la siguiente
       );
 
       // Pausa entre letras
@@ -93,6 +93,66 @@ class _TranslatedButtonState extends State<TranslatedButton> {
     }
 
     if (mounted) setState(() => block = false);
+  }
+
+  // Diálogo de confirmación antes de registrar la respuesta
+  Future<void> _confirmSelection(BuildContext context) async {
+    await _stopSpeech(); // Detiene cualquier pronunciación antes de mostrar el diálogo
+
+    if (!context.mounted) return;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          semanticLabel: "Confirmación de respuesta.", 
+          title: const Text("¿Confirmar respuesta?"),
+          content: Localizations.override(
+            context: context,
+            locale: const Locale('en', 'US'),
+            child: Text(
+              widget.text,
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          actions: <Widget>[
+            // Cancelar — vuelve a las opciones sin perder el foco
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                // Devolver el foco al botón después de cancelar
+                _focusNode.requestFocus();
+                // Volver a pronunciar la palabra para reorientar al usuario
+                _speakNormal();
+              },
+              child: const Text(
+                "Cancelar",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+            // Confirmar — registra la respuesta
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                widget.onPressed?.call();
+              },
+              child: const Text(
+                "Confirmar",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -107,13 +167,11 @@ class _TranslatedButtonState extends State<TranslatedButton> {
     return Focus(
       focusNode: _focusNode,
       child: Semantics(
-        label: "${widget.text}. Toca para escuchar.",
-        onTap: () {
-          _speakNormal();
-        },
+        label: "${widget.text}. Toca dos veces para seleccionar como respuesta.",
+        onTap: () => _confirmSelection(context),
         customSemanticsActions: {
           const CustomSemanticsAction(label: 'Seleccionar como respuesta'): () {
-            widget.onPressed?.call();
+            _confirmSelection(context);
           },
           const CustomSemanticsAction(label: 'Escuchar pronunciación lenta'): () {
               _speakSlowly();
@@ -124,12 +182,8 @@ class _TranslatedButtonState extends State<TranslatedButton> {
         },
         child: GestureDetector(
           excludeFromSemantics: true,
-          onTap: () {
-            _speakNormal();
-          },
-          onDoubleTap: () {
-            widget.onPressed!();
-          },
+          onTap: () => _speakNormal(),
+          onDoubleTap: () => _confirmSelection(context),
           onLongPress: () async {
             if (!block) {
               if (anotherEvent) {
@@ -138,15 +192,14 @@ class _TranslatedButtonState extends State<TranslatedButton> {
               _spellOut();
             }
           },
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              vertical: 24,
-              horizontal: 16,
-            ),
-            color: Colors.indigo,
-            child: Semantics(
-              excludeSemantics: true,
+          child: ExcludeSemantics(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                vertical: 24,
+                horizontal: 16,
+              ),
+              color: Colors.indigo,
               child: Text(
                 widget.text,
                 style: const TextStyle(
@@ -156,7 +209,7 @@ class _TranslatedButtonState extends State<TranslatedButton> {
                 ),
                 textAlign: TextAlign.center,
               ),
-            )
+            ),
           ),
         ),
       ),

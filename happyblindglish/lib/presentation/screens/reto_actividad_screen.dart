@@ -28,6 +28,9 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
   int _indicePregunta = 0; // Índice de la pregunta actual
   int puntosGanados = 0;
   late Reto selectedReto;
+  bool firstTime = true;
+  bool _loading = false;
+
   @override
   void initState() {
     super.initState();
@@ -95,12 +98,28 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
     return preguntas;
   }
 
-  void _playSound(AssetSource sound) async {
+  Future<void> _playSound(AssetSource sound) async {
     try {
       await _audioPlayer.play(sound);
     } catch (e) {
       logger.i("Error al reproducir sonido: $e");
     }
+  }
+
+  Future<void> _answer(bool esCorrecta, Reto state) async {
+    if (_loading) return; // Evita múltiples respuestas rápidas
+    setState(() => _loading = true);
+    
+    if (esCorrecta) {
+      puntosGanados +=
+          state.datosReto.puntosReto ~/ state.datosReto.palabrasPorAprender;
+      await _playSound(AssetSource('sonidos/assert.mp3'));
+      await Future.delayed(const Duration(seconds: 2));
+    } else {
+      await _playSound(AssetSource('sonidos/wrong.mp3'));
+      await Future.delayed(const Duration(seconds: 2));
+    }
+    _siguientePregunta();
   }
 
   void _siguientePregunta() {
@@ -110,6 +129,7 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
           TextDirection.ltr);
       setState(() {
         _indicePregunta++;
+        _loading = false; // libera el bloqueo para la siguiente pregunta
       });
     } else {
       SemanticsService.announce(
@@ -119,20 +139,6 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
     }
   }
 
-  void _hideUI() {
-    setState(() {
-      blockUI = true;
-    });
-  }
-
-  void _showUI() {
-    setState(() {
-      blockUI = false;
-    });
-  }
-
-  bool blockUI = false;
-  bool firstTime = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,145 +199,113 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
           if (firstTime) {
             firstTime = false;
             SemanticsService.announce(
-                "Entraste a, acierta ${selectedReto.datosReto.palabrasPorAprender} ${selectedReto.tema} en inglés",
+                "Entraste a: acierta ${selectedReto.datosReto.palabrasPorAprender} ${selectedReto.tema} en inglés",
                 TextDirection.ltr);
           }
-          return Semantics(
-            excludeSemantics: blockUI,
-            child: SingleChildScrollView(
-              child: Center(
-                child: Column(
+          return SingleChildScrollView(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                // Instrucciones siempre visibles
+                _buildInstructions(),
+                // Contador de preguntas
+                Semantics(
+                  child: Text(
+                    "Pregunta ${_indicePregunta + 1} de ${selectedReto.datosReto.palabrasPorAprender}",
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                // Pregunta
+                Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                  // Instrucciones siempre visibles
-                  _buildInstructions(),
-                  
-                  Semantics(
-                    child: Text(
-                      "Pregunta ${_indicePregunta + 1} de ${selectedReto.datosReto.palabrasPorAprender}",
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        // Permite que el texto use el espacio disponible y haga multilínea
-                        child: Semantics(
-                          child: Align(
-                            child: Text(
-                              preguntas[_indicePregunta].pregunta,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 20),
-                              softWrap: true, // Permite el salto de línea
-                              overflow: TextOverflow
-                                  .visible, // Evita que el texto se corte
-                            ),
+                    Expanded(
+                      // Permite que el texto use el espacio disponible y haga multilínea
+                      child: Semantics(
+                        child: Align(
+                          child: Text(
+                            preguntas[_indicePregunta].pregunta,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 20),
+                            softWrap: true, // Permite el salto de línea
+                            overflow: TextOverflow.visible, // Evita que el texto se corte
                           ),
                         ),
                       ),
-                    ],
-                  ),
-
-                  ListView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: preguntas[_indicePregunta].respuestas.length,
-                    semanticChildCount: preguntas[_indicePregunta]
-                        .respuestas
-                        .length, // Importante
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: TranslatedButton(
+                    ),
+                  ],
+                ),
+                // Opciones de respuesta
+                ExcludeSemantics(
+                  excluding: _loading, // Excluye la semántica mientras se está cargando
+                  child: AbsorbPointer(
+                    absorbing: _loading, // Evita interacciones mientras se está cargando
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: preguntas[_indicePregunta].respuestas.length,
+                      semanticChildCount: preguntas[_indicePregunta]
+                          .respuestas
+                          .length, // Importante
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TranslatedButton(
                             onPressed: () async {
-                              _hideUI();
-                              if (preguntas[_indicePregunta]
-                                  .respuestas[index]
-                                  .correcta) {
-                                puntosGanados += state!.datosReto.puntosReto ~/
-                                    state.datosReto.palabrasPorAprender;
-                                _playSound(AssetSource('sonidos/assert.mp3'));
-                                await Future.delayed(
-                                    const Duration(seconds: 2));
-
-                                _siguientePregunta();
-                              } else {
-                                _playSound(AssetSource('sonidos/wrong.mp3'));
-
-                                await Future.delayed(
-                                    const Duration(seconds: 2));
-
-                                _siguientePregunta();
-                              }
-                              _showUI();
+                              await _answer(
+                                preguntas[_indicePregunta]
+                                    .respuestas[index]
+                                    .correcta,
+                                state!
+                              );
                             },
                             text: preguntas[_indicePregunta]
                                 .respuestas[index]
-                                .respuesta),
-                      );
-                    },
+                                .respuesta
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Semantics(
-                        container: false,
-                        label: "Leer pegunta otra vez",
-                        excludeSemantics: true,
-                        child: IconButton(
-                          icon: const Icon(Icons.replay_outlined),
-                          onPressed: () {
-                            SemanticsService.announce(
-                                preguntas[_indicePregunta].pregunta,
-                                TextDirection.ltr);
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  CustomButton2(
-                    onPressed: () {
-                      // Mostrar el diálogo de confirmación
-                      SemanticsService.announce(
-                          '¿Seguro de que deseas terminar la actividad?',
-                          TextDirection.ltr);
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            content: const Text(
-                                'Perderás los puntos acumulados y no podrás volver a hacer este reto'),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(); // Cerrar el diálogo
-                                },
-                                child: const Text('Cancelar'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(); // Cerrar el diálogo
-                                  Navigator.pop(
-                                      context); // Salir de la pantalla
-                                  SemanticsService.announce(
-                                      'Regresaste a retos del día',
-                                      TextDirection.ltr);
-                                },
-                                child: const Text('Sí, terminar'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    text: Strings.terminarActividad,
-                  )
-                  ],
                 ),
+                // Botón terminar actividad
+                CustomButton2(
+                  onPressed: () {
+                    // Mostrar el diálogo de confirmación
+                    SemanticsService.announce(
+                        '¿Seguro de que deseas terminar la actividad?',
+                        TextDirection.ltr);
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          content: const Text(
+                              'Perderás los puntos acumulados y no podrás volver a hacer este reto'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(), // Cerrar el diálogo
+                              child: const Text('Cancelar'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                                Navigator.pop(context); // Salir de la pantalla
+                                SemanticsService.announce(
+                                    'Regresaste a retos del día',
+                                    TextDirection.ltr);
+                              },
+                              child: const Text('Sí, terminar'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  text: Strings.terminarActividad,
+                  ),
+                ],
               ),
             ),
           );
@@ -342,40 +316,40 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
 }
 
 Widget _buildInstructions() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade400),
-        ),
-        padding: const EdgeInsets.all(12),
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Cómo responder para personas lin lector de pantalla:', 
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold, 
-                color: Colors.black
-              )
-            ),
-            SizedBox(height: 4),
-            Text(
-              "• Toca una vez para escuchar.\n"
-              "• Toca dos veces para seleccionar como respuesta.\n"
-              "• Mantén presionado para escuchar letra por letra.",
-              style: TextStyle(
-                fontSize: 15,
-                color: Colors.black,
-                height: 1.6,
-              ),
-            )
-          ],
-        ),
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+    child: Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.shade400),
       ),
-    );
-  }
+      padding: const EdgeInsets.all(12),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Cómo responder para personas sin lector de pantalla:', 
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold, 
+              color: Colors.black
+            )
+          ),
+          SizedBox(height: 4),
+          Text(
+            "• Toca una vez para escuchar.\n"
+            "• Toca dos veces para seleccionar como respuesta.\n"
+            "• Mantén presionado para escuchar letra por letra.",
+            style: TextStyle(
+              fontSize: 15,
+              color: Colors.black,
+              height: 1.6,
+            ),
+          )
+        ],
+      ),
+    ),
+  );
+}

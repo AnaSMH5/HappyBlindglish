@@ -20,7 +20,6 @@ class LeccionActividadScreen extends StatefulWidget {
 }
 
 class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
-  final AudioPlayer _audioPlayer = AudioPlayer();
   late Leccion selectedLeccion;
   bool blockUI = false;
   final FlutterTts _flutterTts = FlutterTts();
@@ -100,10 +99,10 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
     }
   }
 
-  void _showExitConfirmationDialog() {
+  Future<void> _showExitConfirmationDialog() {
     SemanticsService.announce(
         '¿Seguro de que deseas terminar la actividad?', TextDirection.ltr);
-    showDialog(
+    return showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -202,8 +201,8 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
                           Text("En esta lección, aprenderás palabras básicas."
                                "Para salir podrás usar el botón de 'Terminar actividad' ubicado en la zona baja de la pantalla."),
                           Text("Cada palabra está contenida en un cuadro con 2 acciones."),
-                          Text("Traducir palabra: esta se activa tocando la palabra una vez."),
-                          Text("Pronunciar con tu voz: esta se activa manteniendo presionada la palabra"),
+                          Text("Traducir palabra: esta se activa haciendo clic en la palabra."),
+                          Text("Pronunciar con tu voz: esta se activa con el botón abajo de la palabra"),
                           Text("Con esta opción debes pronunciar la palabra en voz alta."
                                "Si pronuncias la palabra correctamente, la palabra se completará como aprendida y desaparecerá de la lista"),
                           Text("Si quieres conocer las palabras que ya aprendiste, toca el botón de 'Repasar y mostrar palabras aprendidas'"),
@@ -236,7 +235,6 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildInstructions(),
                   _buildToggleButton(), // Usando el botón único
                   _buildWordList(),
                   _buildNavigationRow(),
@@ -272,44 +270,6 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
           child: const Text("Palabras aprendidas"),
         ),
       ],
-    );
-  }
-
-  Widget _buildInstructions() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade400),
-        ),
-        padding: const EdgeInsets.all(12),
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Cómo responder:', 
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold, 
-                color: Colors.black
-              )
-            ),
-            SizedBox(height: 4),
-            Text(
-              "• Toca una vez para escuchar la palabra.\n"
-              "• Mantén presionado para pronunciar la palabra.\n",
-              style: TextStyle(
-                fontSize: 15,
-                color: Colors.black,
-                height: 1.6,
-              ),
-            )
-          ],
-        ),
-      ),
     );
   }
 
