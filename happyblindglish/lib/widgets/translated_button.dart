@@ -7,11 +7,13 @@ import 'package:flutter_tts/flutter_tts.dart';
 class TranslatedButton extends StatefulWidget {
   final void Function()? onPressed;
   final String text;
+  final int index;
 
   const TranslatedButton({
     super.key,
     required this.onPressed,
     required this.text,
+    required this.index,
   });
 
   @override
@@ -84,12 +86,12 @@ class _TranslatedButtonState extends State<TranslatedButton> {
       
       // Espera a que termine de pronunciar la letra
       await completer.future.timeout(
-        const Duration(seconds: 4),
-        onTimeout: () {}, // si tarda más de 4s pasa a la siguiente
+        const Duration(seconds: 2),
+        onTimeout: () {}, // si tarda más de 2s pasa a la siguiente
       );
 
       // Pausa entre letras
-      await Future.delayed(const Duration(milliseconds: 300));
+      await Future.delayed(const Duration(milliseconds: 100));
     }
 
     if (mounted) setState(() => block = false);
@@ -142,7 +144,7 @@ class _TranslatedButtonState extends State<TranslatedButton> {
                 widget.onPressed?.call();
               },
               child: const Text(
-                "Confirmar",
+                "Aceptar",
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -167,7 +169,16 @@ class _TranslatedButtonState extends State<TranslatedButton> {
     return Focus(
       focusNode: _focusNode,
       child: Semantics(
-        label: "${widget.text}. Toca dos veces para seleccionar como respuesta.",
+        button: true,
+        label: "Opción ${widget.index + 1}.",
+         onDidGainAccessibilityFocus: () {
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) _speakNormal();
+          });
+        },
+        onDidLoseAccessibilityFocus: () {
+          _stopSpeech();
+        },
         onTap: () => _confirmSelection(context),
         customSemanticsActions: {
           const CustomSemanticsAction(label: 'Seleccionar como respuesta'): () {

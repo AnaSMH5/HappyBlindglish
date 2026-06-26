@@ -169,7 +169,7 @@ abstract class BancoPalabras {
         tipo: "animales",
         nivel: 3),
     Palabra(
-        palabraEspanol: "gepard",
+        palabraEspanol: "guepardo",
         palabraIngles: "cheetah",
         tipo: "animales",
         nivel: 3),
@@ -234,11 +234,6 @@ abstract class BancoPalabras {
         tipo: "animales",
         nivel: 1),
     Palabra(
-        palabraEspanol: "oveja",
-        palabraIngles: "sheep",
-        tipo: "animales",
-        nivel: 1),
-    Palabra(
         palabraEspanol: "gallina",
         palabraIngles: "hen",
         tipo: "animales",
@@ -274,7 +269,7 @@ abstract class BancoPalabras {
         tipo: "animales",
         nivel: 2),
     Palabra(
-        palabraEspanol: "aguila",
+        palabraEspanol: "águila",
         palabraIngles: "eagle",
         tipo: "animales",
         nivel: 3),
@@ -284,7 +279,7 @@ abstract class BancoPalabras {
         tipo: "animales",
         nivel: 3),
     Palabra(
-        palabraEspanol: "buho",
+        palabraEspanol: "búho",
         palabraIngles: "owl",
         tipo: "animales",
         nivel: 3),
@@ -324,23 +319,8 @@ abstract class BancoPalabras {
         tipo: "animales",
         nivel: 3),
     Palabra(
-        palabraEspanol: "codorniz",
-        palabraIngles: "quail",
-        tipo: "animales",
-        nivel: 3),
-    Palabra(
-        palabraEspanol: "aguila",
-        palabraIngles: "eagle",
-        tipo: "animales",
-        nivel: 3),
-    Palabra(
         palabraEspanol: "búfalo",
         palabraIngles: "buffalo",
-        tipo: "animales",
-        nivel: 3),
-    Palabra(
-        palabraEspanol: "foca",
-        palabraIngles: "seal",
         tipo: "animales",
         nivel: 3),
     Palabra(
@@ -359,23 +339,13 @@ abstract class BancoPalabras {
         tipo: "animales",
         nivel: 3),
     Palabra(
-        palabraEspanol: "aguila real",
+        palabraEspanol: "águila real",
         palabraIngles: "golden eagle",
         tipo: "animales",
         nivel: 3),
     Palabra(
         palabraEspanol: "cardenal",
         palabraIngles: "cardinal",
-        tipo: "animales",
-        nivel: 3),
-    Palabra(
-        palabraEspanol: "mirlo",
-        palabraIngles: "blackbird",
-        tipo: "animales",
-        nivel: 3),
-    Palabra(
-        palabraEspanol: "búho",
-        palabraIngles: "owl",
         tipo: "animales",
         nivel: 3),
 
@@ -456,7 +426,7 @@ abstract class BancoPalabras {
         tipo: "colores",
         nivel: 2),
     Palabra(
-        palabraEspanol: "salmon",
+        palabraEspanol: "salmón",
         palabraIngles: "salmon",
         tipo: "colores",
         nivel: 2),
@@ -810,11 +780,6 @@ abstract class BancoPalabras {
         tipo: "verbos",
         nivel: 1),
     Palabra(
-        palabraEspanol: "trabajar",
-        palabraIngles: "work",
-        tipo: "verbos",
-        nivel: 1),
-    Palabra(
         palabraEspanol: "esperar",
         palabraIngles: "wait",
         tipo: "verbos",
@@ -877,11 +842,6 @@ abstract class BancoPalabras {
     Palabra(
         palabraEspanol: "mover",
         palabraIngles: "move",
-        tipo: "verbos",
-        nivel: 1),
-    Palabra(
-        palabraEspanol: "correr",
-        palabraIngles: "run",
         tipo: "verbos",
         nivel: 1),
     Palabra(
@@ -979,7 +939,7 @@ abstract class BancoPalabras {
         tipo: "saludos",
         nivel: 1),
     Palabra(
-        palabraEspanol: "encantado/a",
+        palabraEspanol: "encantado/a de conocerte",
         palabraIngles: "nice to meet you",
         tipo: "saludos",
         nivel: 1),
@@ -1058,7 +1018,7 @@ abstract class BancoPalabras {
         tipo: "saludos",
         nivel: 1),
     Palabra(
-        palabraEspanol: "¿qué pasa?",
+        palabraEspanol: "¿qué está pasando?",
         palabraIngles: "what's happening?",
         tipo: "saludos",
         nivel: 1),
@@ -1462,23 +1422,6 @@ abstract class BancoPalabras {
         palabraEspanol: "ayer",
         palabraIngles: "yesterday",
         tipo: "fechas",
-        nivel: 1),
-
-    // Colores en inglés
-    Palabra(
-        palabraEspanol: "rojo",
-        palabraIngles: "red",
-        tipo: "colores",
-        nivel: 1),
-    Palabra(
-        palabraEspanol: "azul",
-        palabraIngles: "blue",
-        tipo: "colores",
-        nivel: 1),
-    Palabra(
-        palabraEspanol: "verde",
-        palabraIngles: "green",
-        tipo: "colores",
         nivel: 1),
 
     // Figuras geométricas

@@ -1,7 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 // import 'package:dart_levenshtein/dart_levenshtein.dart'; // usar para mejorar the similarity check
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:happyblindglish/models/palabra.dart';
 import 'package:happyblindglish/providers/db_provider.dart';
 import 'package:logger/logger.dart';

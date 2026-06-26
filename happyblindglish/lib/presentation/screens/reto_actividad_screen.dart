@@ -59,7 +59,7 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
     for (int i = 0; i < selectedReto.datosReto.palabrasPorAprender; i++) {
       var palabra = bancoLocal[random.nextInt(bancoLocal.length)];
       String preguntaTexto =
-          "¿Cómo se dice: ${palabra.palabraEspanol}. En inglés?";
+          "¿Cómo se dice: ${palabra.palabraEspanol} en inglés?";
       String respuestaCorrecta = palabra.palabraIngles;
       String tipoPalabra = palabra.tipo;
 
@@ -139,12 +139,80 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
     }
   }
 
+  Widget _buildInstructions() {
+    final bool lectorActivo = WidgetsBinding.instance.accessibilityFeatures.accessibleNavigation;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.shade400),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: lectorActivo ? const Column( // Con lector de pantalla
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Instrucciones', 
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold, 
+                color: Colors.black
+              )
+            ),
+            SizedBox(height: 4),
+            Text(
+              "• La palabra se pronuncia automáticamente al llegar a ella."
+              " Toca dos veces para seleccionar como respuesta.\n"
+              "• Escucha lo que dice tu sistema y sigue las intrucciones para ver más acciones:"
+              " 'Seleccionar como respuesta', 'Escuchar pronunciación lenta' o 'Escuchar letra por letra'.",
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.black,
+                height: 1.6,
+              ),
+            )
+          ],
+        ) : 
+        // Sin lector de pantalla
+        const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Instrucciones', 
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold, 
+                color: Colors.black
+              )
+            ),
+            SizedBox(height: 4),
+            Text(
+              "• Toca una vez para escuchar.\n"
+              "• Toca dos veces para seleccionar como respuesta.\n"
+              "• Mantén presionado para escuchar letra por letra.",
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.black,
+                height: 1.6,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text("Puntaje: $puntosGanados acumulados"),
+        backgroundColor: Colors.amber,
         actions: [
           Semantics(
             label: "Botón de ayuda",
@@ -160,6 +228,11 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            "El reto son cinco preguntas, cada pregunta cuenta con cuatro (4) opciones de respuesta disponibles."
+                            "Debes elegir la respuesta correcta entre esas opciones."
+                          ),
+                          SizedBox(height: 12),
                           Text(
                             "Sin lector de pantalla:",
                             style: TextStyle(fontWeight: FontWeight.bold),
@@ -218,55 +291,59 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
                   ),
                 ),
                 // Pregunta
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      // Permite que el texto use el espacio disponible y haga multilínea
-                      child: Semantics(
-                        child: Align(
-                          child: Text(
-                            preguntas[_indicePregunta].pregunta,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 20),
-                            softWrap: true, // Permite el salto de línea
-                            overflow: TextOverflow.visible, // Evita que el texto se corte
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                // Opciones de respuesta
                 ExcludeSemantics(
                   excluding: _loading, // Excluye la semántica mientras se está cargando
                   child: AbsorbPointer(
                     absorbing: _loading, // Evita interacciones mientras se está cargando
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: preguntas[_indicePregunta].respuestas.length,
-                      semanticChildCount: preguntas[_indicePregunta]
-                          .respuestas
-                          .length, // Importante
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: TranslatedButton(
-                            onPressed: () async {
-                              await _answer(
-                                preguntas[_indicePregunta]
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              // Permite que el texto use el espacio disponible y haga multilínea
+                              child: Semantics(
+                                child: Align(
+                                  child: Text(
+                                    preguntas[_indicePregunta].pregunta,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 20),
+                                    softWrap: true, // Permite el salto de línea
+                                    overflow: TextOverflow.visible, // Evita que el texto se corte
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                         ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: preguntas[_indicePregunta].respuestas.length,
+                          semanticChildCount: preguntas[_indicePregunta]
+                              .respuestas
+                              .length, // Importante
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TranslatedButton(
+                                onPressed: () async {
+                                  await _answer(
+                                    preguntas[_indicePregunta]
+                                        .respuestas[index]
+                                        .correcta,
+                                    state!
+                                  );
+                                },
+                                text: preguntas[_indicePregunta]
                                     .respuestas[index]
-                                    .correcta,
-                                state!
-                              );
-                            },
-                            text: preguntas[_indicePregunta]
-                                .respuestas[index]
-                                .respuesta
-                          ),
-                        );
-                      },
+                                    .respuesta,
+                                index: index
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -313,43 +390,4 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
       ),
     );
   }
-}
-
-Widget _buildInstructions() {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-    child: Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.grey.shade200,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade400),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: const Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Cómo responder para personas sin lector de pantalla:', 
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold, 
-              color: Colors.black
-            )
-          ),
-          SizedBox(height: 4),
-          Text(
-            "• Toca una vez para escuchar.\n"
-            "• Toca dos veces para seleccionar como respuesta.\n"
-            "• Mantén presionado para escuchar letra por letra.",
-            style: TextStyle(
-              fontSize: 15,
-              color: Colors.black,
-              height: 1.6,
-            ),
-          )
-        ],
-      ),
-    ),
-  );
 }

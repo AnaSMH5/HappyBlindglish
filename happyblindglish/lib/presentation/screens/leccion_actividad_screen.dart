@@ -1,4 +1,4 @@
-import 'package:audioplayers/audioplayers.dart';
+//import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -197,6 +197,8 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
                     return AlertDialog(
                       title: const Text('Instrucciones'),
                       content: const Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text("En esta lección, aprenderás palabras básicas."
                                "Para salir podrás usar el botón de 'Terminar actividad' ubicado en la zona baja de la pantalla."),
