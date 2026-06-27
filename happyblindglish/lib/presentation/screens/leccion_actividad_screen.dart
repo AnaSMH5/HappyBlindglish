@@ -202,11 +202,11 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
                         children: [
                           Text("En esta lección, aprenderás palabras básicas."
                                "Para salir podrás usar el botón de 'Terminar actividad' ubicado en la zona baja de la pantalla."),
-                          Text("Cada palabra está contenida en un cuadro con 2 acciones."),
+                          Text("En cada página aparece una palabra en español, su pronunicación en inglés y el microfóno para que tú pronuncies la palabra."),
                           Text("Traducir palabra: esta se activa haciendo clic en la palabra."),
-                          Text("Pronunciar con tu voz: esta se activa con el botón abajo de la palabra"),
+                          Text("Pronunciar con tu voz: esta se activa con el botón abajo de la palabra."),
                           Text("Con esta opción debes pronunciar la palabra en voz alta."
-                               "Si pronuncias la palabra correctamente, la palabra se completará como aprendida y desaparecerá de la lista"),
+                               "Si pronuncias la palabra correctamente, la palabra se completará como aprendida y desaparecerá de esa lista"),
                           Text("Si quieres conocer las palabras que ya aprendiste, toca el botón de 'Repasar y mostrar palabras aprendidas'"),
                           ],
                         ),

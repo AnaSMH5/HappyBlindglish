@@ -132,11 +132,109 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
         _loading = false; // libera el bloqueo para la siguiente pregunta
       });
     } else {
-      SemanticsService.announce(
-          "$puntosGanados puntos ganados, actividad finalizada, Te encuentras en: Retos del día",
-          TextDirection.ltr);
-      Navigator.pop(context);
+      // Moastrar el resultado final del reto
+      setState(() => _loading = false);
+      _mostrarResultado();
     }
+  }
+
+
+  void _mostrarResultado() {
+    final int total = selectedReto.datosReto.puntosReto;
+    final int preguntas = selectedReto.datosReto.palabrasPorAprender;
+    final double porcentaje = (puntosGanados / total) * 100;
+
+    // Mensaje según el desempeño
+    String mensaje;
+    if (porcentaje == 100) {
+      mensaje = "¡Perfecto! Respondiste todo correctamente.";
+    } else if (porcentaje >= 60) {
+      mensaje = "¡Buen trabajo! Sigue practicando.";
+    } else {
+      mensaje = "Sigue intentándolo, puedes mejorar.";
+    }
+
+    // Anunciar resultado por voz
+    SemanticsService.announce(
+      "Actividad finalizada. "
+      "Obtuviste $puntosGanados de $total puntos. "
+      "$mensaje",
+      TextDirection.ltr,
+    );
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          semanticLabel: "Resultado del reto.",
+          title: const Text(
+            "Reto finalizado",
+            textAlign: TextAlign.center,
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Puntos obtenidos
+              Text(
+                "$puntosGanados",
+                style: const TextStyle(
+                  fontSize: 64,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xff5B2D8E),
+                ),
+                textAlign: TextAlign.center,
+              ),
+              Text(
+                "de $total puntos",
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black54,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              // Preguntas correctas
+              Text(
+                "${(puntosGanados / (total ~/ preguntas))} "
+                "de $preguntas respuestas correctas",
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              // Mensaje según desempeño
+              Text(
+                mensaje,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                Navigator.pop(context);
+                SemanticsService.announce(
+                  "Regresaste a retos del día.",
+                  TextDirection.ltr,
+                );
+              },
+              child: const Text(
+                "Volver a retos",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildInstructions() {

@@ -48,6 +48,7 @@ class _TranslatedButtonState extends State<TranslatedButton> {
   Future<void> _speakSlowly() async {
     await _stopSpeech();
     await _flutterTts.setLanguage("en-US");
+    await _flutterTts.setVolume(1.0); 
     await _flutterTts.setSpeechRate(0.2); // Velocidad lenta
     await _flutterTts.speak(widget.text);
   }
@@ -55,6 +56,7 @@ class _TranslatedButtonState extends State<TranslatedButton> {
   Future<void> _speakNormal() async {
     await _stopSpeech();
     await _flutterTts.setLanguage("en-US");
+    await _flutterTts.setVolume(1.0); 
     await _flutterTts.setSpeechRate(0.5); // Velocidad normal
     await _flutterTts.speak(widget.text);
   }
@@ -68,7 +70,8 @@ class _TranslatedButtonState extends State<TranslatedButton> {
     anotherEvent = false;
 
     await _flutterTts.setLanguage("es-MX"); // si es de col colocar es-CO, sino dejar es-MX
-    await _flutterTts.setSpeechRate(0.6);
+    await _flutterTts.setVolume(1.0); 
+    await _flutterTts.setSpeechRate(0.55);
 
     List<String> letters = widget.text.toUpperCase().split('');
 
@@ -91,7 +94,7 @@ class _TranslatedButtonState extends State<TranslatedButton> {
       );
 
       // Pausa entre letras
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future.delayed(const Duration(milliseconds: 50));
     }
 
     if (mounted) setState(() => block = false);
@@ -110,9 +113,14 @@ class _TranslatedButtonState extends State<TranslatedButton> {
         return AlertDialog(
           semanticLabel: "Confirmación de respuesta.", 
           title: const Text("¿Confirmar respuesta?"),
-          content: Localizations.override(
-            context: context,
-            locale: const Locale('en', 'US'),
+          content: Semantics(
+            label: "Opción ${widget.index + 1}.",
+            excludeSemantics: true,
+            onDidGainAccessibilityFocus: () {
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (mounted) _speakNormal();
+              });
+            },
             child: Text(
               widget.text,
               style: const TextStyle(
