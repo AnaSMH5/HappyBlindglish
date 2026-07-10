@@ -162,7 +162,7 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
         isLastPage = true;
       });
     }
-    SemanticsService.announce("Pagina ${_currentPage + 1}", TextDirection.ltr);
+    SemanticsService.announce("Página ${_currentPage + 1}", TextDirection.ltr);
   }
 
   void _previousPage() async {

@@ -58,6 +58,8 @@ class _TranslatedButtonState extends State<TranslatedButton> {
     await _flutterTts.setLanguage("en-US");
     await _flutterTts.setVolume(1.0); 
     await _flutterTts.setSpeechRate(0.5); // Velocidad normal
+
+    await _flutterTts.setSharedInstance(true);
     await _flutterTts.speak(widget.text);
   }
 
@@ -117,7 +119,7 @@ class _TranslatedButtonState extends State<TranslatedButton> {
             label: "Opción ${widget.index + 1}.",
             excludeSemantics: true,
             onDidGainAccessibilityFocus: () {
-              Future.delayed(const Duration(milliseconds: 500), () {
+              Future.delayed(const Duration(milliseconds: 1400), () {
                 if (mounted) _speakNormal();
               });
             },
@@ -180,12 +182,14 @@ class _TranslatedButtonState extends State<TranslatedButton> {
         button: true,
         label: "Opción ${widget.index + 1}.",
          onDidGainAccessibilityFocus: () {
-          Future.delayed(const Duration(milliseconds: 500), () {
+          Future.delayed(const Duration(milliseconds: 800), () {
             if (mounted) _speakNormal();
           });
         },
         onDidLoseAccessibilityFocus: () {
-          _stopSpeech();
+          Future.delayed(const Duration(milliseconds: 100), () {
+            _stopSpeech();
+          });
         },
         onTap: () => _confirmSelection(context),
         customSemanticsActions: {

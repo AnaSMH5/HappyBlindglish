@@ -1,6 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 // import 'package:dart_levenshtein/dart_levenshtein.dart'; // usar para mejorar the similarity check
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:happyblindglish/models/palabra.dart';
 import 'package:happyblindglish/providers/db_provider.dart';
 import 'package:logger/logger.dart';
@@ -26,7 +27,8 @@ class LeccionButton extends StatefulWidget {
 }
 
 class _LeccionButtonState extends State<LeccionButton> {
-  final stt.SpeechToText _speechToText = stt.SpeechToText();
+  stt.SpeechToText _speechToText = stt.SpeechToText(); // Se reemplaza en cada uso
+
   final AudioPlayer _audioPlayer = AudioPlayer();
   final FlutterTts _flutterTts = FlutterTts();  
   final FocusNode _focusNode = FocusNode(); 
@@ -36,16 +38,34 @@ class _LeccionButtonState extends State<LeccionButton> {
   bool _listening = false;
   bool _listened = false;
 
+  @override
+  void didUpdateWidget(LeccionButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Si cambió la palabra, resetear el estado
+    if (oldWidget.palabra.palabraEspanol != widget.palabra.palabraEspanol) {
+      setState(() {
+        _listened = false;
+        _listening = false;
+      });
+      _flutterTts.stop();
+      _speechToText.cancel();
+    }
+  }
+
   Future<void> _pronunciarPalabra() async {
     await _flutterTts.stop();
     await _flutterTts.setLanguage("en-US");
+    await _flutterTts.setVolume(1.0);
     await _flutterTts.setSpeechRate(0.4);
-    await _flutterTts.speak(widget.palabra.palabraIngles);
 
-    // Marcar la palabra como escuchada para habilitar el micrófono
-    if (!_listened) {
-      setState(() =>_listened = true);
-    }
+    // Marcar la palabra como escuchada para habilitar el micrófono cuando el TTS termine de hablar
+    _flutterTts.setCompletionHandler(() {
+      if (mounted && !_listened) {
+        setState(() => _listened = true);
+      }
+    });
+
+    await _flutterTts.speak(widget.palabra.palabraIngles);
   }
 
   Future<void> _playSound(AssetSource sound) async {
@@ -59,8 +79,6 @@ class _LeccionButtonState extends State<LeccionButton> {
   Future<void> _startListening() async {
     if (!_listened) {
       logger.w("El usuario debe escuchar la palabra antes de practicar la pronunciación.");
-      await _flutterTts.setLanguage("es-MX");
-      await _flutterTts.speak("Debes escuchar primero la palabra antes de practicar la pronunciación.");
       return;
     }
 
@@ -69,41 +87,66 @@ class _LeccionButtonState extends State<LeccionButton> {
     // Detener TTS antes de escuchar
     await _flutterTts.stop();
 
-    final targetWord = widget.palabra.palabraIngles.toLowerCase().trim();
-    const double similarityThreshold = 0.3;
+    // Crear una nueva instancia limpia de SpeechToText para evitar problemas de estado
+    await _speechToText.cancel();
+    _speechToText = stt.SpeechToText();
 
     final initialized = await _speechToText.initialize(
-      onError: (error) => logger.e("STT error: $error"),
+      onError: (error) {
+        logger.e("STT error: $error"); 
+        if (mounted) setState(() => _listening = false);
+      },
+      onStatus: (status) {
+        logger.i("STT status: $status");
+        // Si el STT se detiene solo (timeout), actualizar el estado
+        if (status == stt.SpeechToText.doneStatus ||
+            status == stt.SpeechToText.notListeningStatus) {
+          if (mounted && _listening) {
+            setState(() => _listening = false);
+          }
+        }
+      },
     );
 
     if (!initialized) {
       logger.e("Error al inicializar SpeechToText.");
+      if (mounted) {
+        await _flutterTts.setLanguage("es-MX");
+        await _flutterTts.speak("No se pudo activar el micrófono.");
+      }
       return;
     }
-
+  
+    if (!mounted) return;
     setState(() => _listening = true);
 
-    // Anunciar que el micrófono está activo
-    await _flutterTts.setLanguage("es-CO");
-    await _flutterTts.speak("Escuchando");
+    // Anunciar que el micrófono está activado y que el usuario debe hablar ahora
+    await _flutterTts.setLanguage("es-MX");
     await Future.delayed(const Duration(milliseconds: 800));
+    
+    if (!mounted) return;
+
+    final targetWord = widget.palabra.palabraIngles.toLowerCase().trim();
+    const double similarityThreshold = 0.3;
 
     _speechToText.listen(
       onResult: (result) async {
         if (!result.finalResult) return;
+        if (!mounted) return;
+
+        await _speechToText.stop();
 
         setState(() => _listening = false);
 
-        String recognizedPhrase = result.recognizedWords.toLowerCase().trim();
+        final recognizedPhrase = result.recognizedWords.toLowerCase().trim();
         logger.i("Frase reconocida: $recognizedPhrase");
 
-        List<String> wordsInPhrase = recognizedPhrase.split(" ");
+        final wordsInPhrase = recognizedPhrase.split(" ");
         bool esCorrecto = false;
 
         for (var word in wordsInPhrase) {
-          double similarity = jaccardSimilarity(word, targetWord);
+          final similarity = jaccardSimilarity(word, targetWord);
           logger.i("Comparando '$word' con '$targetWord' - Similitud: $similarity");
-
           if (similarity >= similarityThreshold) {
             esCorrecto = true;
             break;
@@ -114,7 +157,7 @@ class _LeccionButtonState extends State<LeccionButton> {
           await _playSound(AssetSource("sonidos/assert.mp3"));
           logger.i("Correcto. Marcando como aprendida.");
 
-          Palabra nuevaPalabra = Palabra(
+          final Palabra nuevaPalabra = Palabra(
             palabraEspanol: widget.palabra.palabraEspanol,
             palabraIngles: widget.palabra.palabraIngles,
             tipo: widget.palabra.tipo,
@@ -128,14 +171,17 @@ class _LeccionButtonState extends State<LeccionButton> {
           );
 
           widget.onCorrectPronunciation?.call(nuevaPalabra);
+
         } else {
           logger.i("Incorrecto.");
+          
           await _playSound(AssetSource("sonidos/wrong.mp3"));
+          await Future.delayed(const Duration(milliseconds: 1500));
         }
-
-        _speechToText.stop();
       },
+
       listenFor: const Duration(seconds: 5),
+      pauseFor: const Duration(seconds: 3),
       localeId: "en-US",
       onSoundLevelChange: (level) => logger.i("Nivel de sonido: $level"),
     );
@@ -166,6 +212,7 @@ class _LeccionButtonState extends State<LeccionButton> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        // Tarjeta de la palabra
         Focus(
           focusNode: _focusNode,
           child: Semantics(
@@ -237,7 +284,7 @@ class _LeccionButtonState extends State<LeccionButton> {
             button: true,
             label: _listening ? "Escuchando, habla ahora"
               : _listened ? "Pronunciar con tu voz. Doble tap para activar el micrófono"
-              : "Escucha la palabra primero antes de pronunciar",
+                : "Escucha la palabra primero antes de pronunciar",
             onTap: _startListening,
             child: GestureDetector(
               excludeFromSemantics: true,
