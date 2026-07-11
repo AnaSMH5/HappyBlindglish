@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:happyblindglish/presentation/blocs/leccion_cubit.dart';
 import 'package:happyblindglish/presentation/blocs/reto_cubit.dart';
@@ -16,9 +17,15 @@ import 'package:happyblindglish/presentation/screens/retos_del_dia_screen.dart';
 import 'package:happyblindglish/providers/db_provider.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:round_spot/round_spot.dart' as rs;
+import 'package:shared_preferences/shared_preferences.dart';
+
+final logger = Logger(
+  printer: PrettyPrinter(),
+);
 
 class BlocsProviders extends StatelessWidget {
-  const BlocsProviders({super.key});
+  final bool isFirstLaunch;
+  const BlocsProviders({super.key, required this.isFirstLaunch});
 
   @override
   Widget build(BuildContext context) {
@@ -28,25 +35,29 @@ class BlocsProviders extends StatelessWidget {
           create: (context) => TutorialPreferenceCubit(),
         ),
         BlocProvider(
-          create: (context) => RetoCubit(),
-          lazy: true,
+          create: (context) => RetoCubit(), lazy: true,
         ),
         BlocProvider(
-          create: (context) => LeccionCubit(),
-          lazy: true,
+          create: (context) => LeccionCubit(), lazy: true,
         ),
       ],
-      child: const MyApp(),
+      child: MyApp(isFirstLaunch: isFirstLaunch),
     );
   }
 }
 
 String? sessionFolderPath;
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final prefs = await SharedPreferences.getInstance();
+  final onboardingViewed = prefs.getBool('onboarding_viewed') ?? false;
+  logger.i("onboarding_viewed: $onboardingViewed");
+
   runApp(rs.initialize(
     config: rs.Config(heatMapStyle: rs.HeatMapStyle.smooth),
     loggingLevel: rs.LogLevel.warning,
-    child: const BlocsProviders(),
+    child: BlocsProviders(isFirstLaunch: !onboardingViewed),
     localRenderCallback: (data, info) async {
       // Asegura que todas las imágenes de la sesión se guarden en la misma carpeta
       await saveImageInSingleSession(data, info);
@@ -80,7 +91,8 @@ Future<void> saveImageInSingleSession(
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.isFirstLaunch});
+  final bool isFirstLaunch;
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -88,6 +100,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final db = DatabaseProvider();
+
   @override
   void initState() {
     super.initState();
@@ -100,7 +113,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       navigatorObservers: [rs.Observer()],
-      initialRoute: "pantalla_inicial_tutorial",
+      initialRoute: widget.isFirstLaunch ? "pantalla_inicial_tutorial" : "pantalla_principal",
       routes: {
         "reto_actividad_screen": (context) => const RetoActividadScreen(),
         "pantalla_inicial_tutorial": (context) => const OnboardingScreen(),

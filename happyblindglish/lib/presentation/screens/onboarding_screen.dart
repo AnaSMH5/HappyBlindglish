@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:happyblindglish/widgets/custom_button_1.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -23,15 +24,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     GlobalKey<OnboardingPageState>(),
   ];
 
+  Future<void> _jumpIntroduction() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('onboarding_viewed', true);
+    if (mounted) {
+      Navigator.pushReplacementNamed(context, "pantalla_principal");
+    }
+  }
+
   void _nextPage() {
-    setState(() {
-      blockUI = true;
-    });
+    setState(() =>blockUI = true);
     if (_currentPage < 2) {
       _pageController.nextPage(
           duration: const Duration(milliseconds: 500), curve: Curves.ease);
     } else {
-      Navigator.pushReplacementNamed(context, "pantalla_principal");
+      _jumpIntroduction();
     }
     Future.delayed(const Duration(milliseconds: 100)).then((_) {
       setState(() {
@@ -64,6 +71,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
+        actions: [
+          if (_currentPage < 2)
+            Semantics(
+              label: "Saltar introducción e ir a la pantalla principal",
+              button: true,
+              child: TextButton(
+                onPressed: _jumpIntroduction,
+                child: const Text("Saltar")
+              )
+            )
+        ]
       ),
       backgroundColor: Colors.white,
       body: Column(

@@ -53,7 +53,7 @@ class _MainCustomScaffoldState extends State<MainCustomScaffold> {
         actions: [
           Semantics(
               excludeSemantics: true,
-              label: "Boton de ayuda",
+              label: "Botón de ayuda",
               button: false,
               child: IconButton(
                   onPressed: () {
@@ -92,10 +92,12 @@ class _MainCustomScaffoldState extends State<MainCustomScaffold> {
       body: BlocBuilder<TutorialPreferenceCubit, bool>(
         builder: (context, state) => Center(
           child: Padding(
-            padding: const EdgeInsets.only(
-                right: AppUtils.generalPadding, left: AppUtils.generalPadding),
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppUtils.generalPadding,
+                vertical: AppUtils.generalPadding),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Visibility(
                   visible: state ||
