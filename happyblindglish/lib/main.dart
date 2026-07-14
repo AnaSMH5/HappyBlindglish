@@ -19,9 +19,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:round_spot/round_spot.dart' as rs;
 import 'package:shared_preferences/shared_preferences.dart';
 
-final logger = Logger(
-  printer: PrettyPrinter(),
-);
+final logger = Logger();
 
 class BlocsProviders extends StatelessWidget {
   final bool isFirstLaunch;

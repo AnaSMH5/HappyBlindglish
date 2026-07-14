@@ -626,7 +626,7 @@ abstract class BancoPalabras {
         tipo: "colores",
         nivel: 2),
 
-    // Letras
+    // letras
     Palabra(palabraEspanol: "a", palabraIngles: "a", tipo: "letras", nivel: 1),
     Palabra(palabraEspanol: "b", palabraIngles: "b", tipo: "letras", nivel: 1),
     Palabra(palabraEspanol: "c", palabraIngles: "c", tipo: "letras", nivel: 1),
@@ -902,6 +902,11 @@ abstract class BancoPalabras {
 
     // Saludos
     Palabra(
+        palabraEspanol: "hola",
+        palabraIngles: "hello/hi",
+        tipo: "saludos",
+        nivel: 1),
+    Palabra(
         palabraEspanol: "buenos días",
         palabraIngles: "good morning",
         tipo: "saludos",
@@ -912,8 +917,13 @@ abstract class BancoPalabras {
         tipo: "saludos",
         nivel: 1),
     Palabra(
-        palabraEspanol: "buenas noches",
+        palabraEspanol: "buenas noches (saludo)",
         palabraIngles: "good evening",
+        tipo: "saludos",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "buenas noches (despedida)",
+        palabraIngles: "good night",
         tipo: "saludos",
         nivel: 1),
     Palabra(
@@ -943,9 +953,16 @@ abstract class BancoPalabras {
         palabraIngles: "nice to meet you",
         tipo: "saludos",
         nivel: 1),
+    //Palabra(
+    //    palabraEspanol: "igualmente", palabraIngles: "likewise", tipo: "saludos", nivel: 1),
     Palabra(
-        palabraEspanol: "igualmente",
-        palabraIngles: "likewise",
+        palabraEspanol: "yo también",
+        palabraIngles: "me too",
+        tipo: "saludos",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "nos vemos",
+        palabraIngles: "see you",
         tipo: "saludos",
         nivel: 1),
     Palabra(
@@ -969,8 +986,8 @@ abstract class BancoPalabras {
         tipo: "saludos",
         nivel: 1),
     Palabra(
-        palabraEspanol: "mucho gusto",
-        palabraIngles: "pleasure to meet you",
+        palabraEspanol: "es un placer",
+        palabraIngles: "it's my pleasure",
         tipo: "saludos",
         nivel: 1),
     Palabra(
@@ -1003,6 +1020,16 @@ abstract class BancoPalabras {
         tipo: "saludos",
         nivel: 1),
     Palabra(
+        palabraEspanol: "gracias",
+        palabraIngles: "thank you",
+        tipo: "saludos",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "por favor",
+        palabraIngles: "please",
+        tipo: "saludos",
+        nivel: 1),
+    Palabra(
         palabraEspanol: "perdón",
         palabraIngles: "sorry",
         tipo: "saludos",
@@ -1014,7 +1041,7 @@ abstract class BancoPalabras {
         nivel: 1),
     Palabra(
         palabraEspanol: "con permiso",
-        palabraIngles: "pardon me",
+        palabraIngles: "excuse me",
         tipo: "saludos",
         nivel: 1),
     Palabra(
@@ -1088,13 +1115,23 @@ abstract class BancoPalabras {
         tipo: "saludos",
         nivel: 1),
     Palabra(
-        palabraEspanol: "salud",
-        palabraIngles: "cheers",
+        palabraEspanol: "¡salud!",
+        palabraIngles: "cheers!",
         tipo: "saludos",
         nivel: 1),
     Palabra(
-        palabraEspanol: "adiós, hasta la próxima",
-        palabraIngles: "goodbye, until next time",
+        palabraEspanol: "adiós",
+        palabraIngles: "goodbye",
+        tipo: "saludos",
+        nivel: 1),   
+    Palabra(
+        palabraEspanol: "chao",
+        palabraIngles: "bye",
+        tipo: "saludos",
+        nivel: 1),  
+    Palabra(
+        palabraEspanol: "hasta la próxima",
+        palabraIngles: "until next time",
         tipo: "saludos",
         nivel: 1),
     Palabra(
@@ -1103,7 +1140,7 @@ abstract class BancoPalabras {
         tipo: "saludos",
         nivel: 1),
     Palabra(
-        palabraEspanol: "claro que sí",
+        palabraEspanol: "por supuesto",
         palabraIngles: "of course",
         tipo: "saludos",
         nivel: 1),
@@ -1310,12 +1347,7 @@ abstract class BancoPalabras {
         tipo: "familia",
         nivel: 2),
     Palabra(
-        palabraEspanol: "gemelo",
-        palabraIngles: "twin",
-        tipo: "familia",
-        nivel: 2),
-    Palabra(
-        palabraEspanol: "gemela",
+        palabraEspanol: "gemelo/a",
         palabraIngles: "twin",
         tipo: "familia",
         nivel: 2),
@@ -1366,14 +1398,27 @@ abstract class BancoPalabras {
         nivel: 2),
     // Números cardinales y ordinales
     Palabra(
+        palabraEspanol: "cero", palabraIngles: "zero", tipo: "numeros", nivel: 1),
+    Palabra(
         palabraEspanol: "uno", palabraIngles: "one", tipo: "numeros", nivel: 1),
     Palabra(
         palabraEspanol: "dos", palabraIngles: "two", tipo: "numeros", nivel: 1),
     Palabra(
-        palabraEspanol: "tres",
-        palabraIngles: "three",
-        tipo: "numeros",
-        nivel: 1),
+        palabraEspanol: "tres", palabraIngles: "three", tipo: "numeros", nivel: 1),
+    Palabra(
+        palabraEspanol: "cuatro", palabraIngles: "four", tipo: "numeros", nivel: 1),
+    Palabra(
+        palabraEspanol: "cinco", palabraIngles: "five", tipo: "numeros", nivel: 1),
+    Palabra(
+        palabraEspanol: "seis", palabraIngles: "six", tipo: "numeros", nivel: 1),
+    Palabra(
+        palabraEspanol: "siete", palabraIngles: "seven", tipo: "numeros", nivel: 1),
+    Palabra(
+        palabraEspanol: "ocho", palabraIngles: "eight", tipo: "numeros", nivel: 1),
+    Palabra(
+        palabraEspanol: "nueve", palabraIngles: "nine", tipo: "numeros", nivel: 1),
+    Palabra(
+        palabraEspanol: "diez", palabraIngles: "ten", tipo: "numeros", nivel: 1),
     Palabra(
         palabraEspanol: "primero",
         palabraIngles: "first",
@@ -1382,6 +1427,11 @@ abstract class BancoPalabras {
     Palabra(
         palabraEspanol: "segundo",
         palabraIngles: "second",
+        tipo: "numeros",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "tercero",
+        palabraIngles: "third",
         tipo: "numeros",
         nivel: 1),
 
@@ -1397,6 +1447,31 @@ abstract class BancoPalabras {
         tipo: "dias_meses",
         nivel: 1),
     Palabra(
+        palabraEspanol: "miércoles",
+        palabraIngles: "Wednesday",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "jueves",
+        palabraIngles: "Thursday",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "viernes",
+        palabraIngles: "Friday",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "sábado",
+        palabraIngles: "Saturday",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "domingo",
+        palabraIngles: "Sunday",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
         palabraEspanol: "enero",
         palabraIngles: "January",
         tipo: "dias_meses",
@@ -1406,8 +1481,57 @@ abstract class BancoPalabras {
         palabraIngles: "February",
         tipo: "dias_meses",
         nivel: 1),
-
-    // Fechas en inglés
+    Palabra(
+        palabraEspanol: "marzo",
+        palabraIngles: "March",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "abril",
+        palabraIngles: "April",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "mayo",
+        palabraIngles: "May",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "junio",
+        palabraIngles: "June",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "julio",
+        palabraIngles: "July",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "agosto",
+        palabraIngles: "August",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "septiembre",
+        palabraIngles: "September",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "octubre",
+        palabraIngles: "October",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "noviembre",
+        palabraIngles: "November",
+        tipo: "dias_meses",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "diciembre",
+        palabraIngles: "December",
+        tipo: "dias_meses",
+        nivel: 1),
+    // Adverbios de tiempo
     Palabra(
         palabraEspanol: "hoy",
         palabraIngles: "today",
@@ -1435,6 +1559,16 @@ abstract class BancoPalabras {
         palabraIngles: "square",
         tipo: "figuras",
         nivel: 1),
+    Palabra(
+        palabraEspanol: "triángulo",
+        palabraIngles: "triangle",
+        tipo: "figuras",
+        nivel: 1),
+    Palabra(
+        palabraEspanol: "rectángulo",
+        palabraIngles: "rectangle",
+        tipo: "figuras",
+        nivel: 1),
 
     // Partes del cuerpo
     Palabra(
@@ -1452,10 +1586,19 @@ abstract class BancoPalabras {
     Palabra(
         palabraEspanol: "yo", palabraIngles: "I", tipo: "pronombres", nivel: 1),
     Palabra(
-        palabraEspanol: "tú",
-        palabraIngles: "you",
-        tipo: "pronombres",
-        nivel: 1),
+        palabraEspanol: "tú/usted", palabraIngles: "you", tipo: "pronombres", nivel: 1),
+    Palabra(
+        palabraEspanol: "él", palabraIngles: "he", tipo: "pronombres", nivel: 1),
+    Palabra(
+        palabraEspanol: "ella", palabraIngles: "she", tipo: "pronombres", nivel: 1),
+    Palabra(
+        palabraEspanol: "eso/esa", palabraIngles: "it", tipo: "pronombres", nivel: 1), 
+    Palabra(
+        palabraEspanol: "nosotros/nosotras", palabraIngles: "we", tipo: "pronombres", nivel: 1),
+    Palabra(
+        palabraEspanol: "ustedes", palabraIngles: "you", tipo: "pronombres", nivel: 2),
+    Palabra(
+        palabraEspanol: "ellos/ellas", palabraIngles: "they", tipo: "pronombres", nivel: 1),
 
     // Profesiones en inglés
     Palabra(

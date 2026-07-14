@@ -3,6 +3,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vibration/vibration.dart';
 import 'package:happyblindglish/global/banco_palabras.dart';
 import 'package:happyblindglish/models/palabra.dart';
 import 'package:happyblindglish/models/pregunta_respuestas.dart';
@@ -114,9 +115,15 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
       puntosGanados +=
           state.datosReto.puntosReto ~/ state.datosReto.palabrasPorAprender;
       await _playSound(AssetSource('sonidos/assert.mp3'));
+      if (await Vibration.hasVibrator()) {
+        Vibration.vibrate(duration: 200);
+      }
       await Future.delayed(const Duration(seconds: 2));
     } else {
       await _playSound(AssetSource('sonidos/wrong.mp3'));
+      if (await Vibration.hasVibrator()) {
+        Vibration.vibrate(pattern: [0, 300, 200, 300]);
+      }
       await Future.delayed(const Duration(seconds: 2));
     }
     _siguientePregunta();

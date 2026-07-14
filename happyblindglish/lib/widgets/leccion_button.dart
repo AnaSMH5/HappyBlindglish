@@ -2,11 +2,12 @@ import 'package:audioplayers/audioplayers.dart';
 // import 'package:dart_levenshtein/dart_levenshtein.dart'; // usar para mejorar the similarity check
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:happyblindglish/models/palabra.dart';
 import 'package:happyblindglish/providers/db_provider.dart';
 import 'package:logger/logger.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:flutter_tts/flutter_tts.dart';
+import 'package:vibration/vibration.dart';
 
 final logger = Logger();
 
@@ -155,6 +156,9 @@ class _LeccionButtonState extends State<LeccionButton> {
 
         if (esCorrecto) {
           await _playSound(AssetSource("sonidos/assert.mp3"));
+          if (await Vibration.hasVibrator()) {
+            Vibration.vibrate(duration: 200);
+          }
           logger.i("Correcto. Marcando como aprendida.");
 
           final Palabra nuevaPalabra = Palabra(
@@ -176,6 +180,9 @@ class _LeccionButtonState extends State<LeccionButton> {
           logger.i("Incorrecto.");
           
           await _playSound(AssetSource("sonidos/wrong.mp3"));
+          if (await Vibration.hasVibrator()) {
+            Vibration.vibrate(pattern: [0, 300, 200, 300]);
+          }
           await Future.delayed(const Duration(milliseconds: 1500));
         }
       },

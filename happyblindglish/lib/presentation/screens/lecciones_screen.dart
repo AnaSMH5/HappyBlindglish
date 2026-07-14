@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:happyblindglish/models/leccion.dart';
 import 'package:happyblindglish/presentation/blocs/leccion_cubit.dart';
 import 'package:happyblindglish/presentation/screens/generic_scaffolds/main_custom_scaffold.dart';
-import 'package:happyblindglish/providers/db_provider.dart';
 import 'package:happyblindglish/utils/app_utils.dart';
 
 class LeccionesScreen extends StatefulWidget {
@@ -28,14 +27,13 @@ class _LeccionesScreenState extends State<LeccionesScreen> {
   Future<List<Leccion>> _obtenerLeccionesDelDia() async {
 
     List<Leccion> todasLasLecciones = [
-      Leccion(
-          tema: "animales",
-          nombre: 'Aprende nombres de animales',
-          dificultad: 1),
-      Leccion(tema: "colores", nombre: 'Aprende colores', dificultad: 1),
+      Leccion(tema: "animales", nombre: 'Los animales', dificultad: 1),
+      Leccion(tema: "colores", nombre: 'Los colores', dificultad: 1),
       Leccion(tema: "verbos", nombre: 'Aprende verbos', dificultad: 1),
-      Leccion(
-          tema: "saludos", nombre: "Aprende frases cotidianas", dificultad: 1),
+      Leccion(tema: "saludos", nombre: "Frases cotidianas", dificultad: 1),
+      Leccion(tema: "letras", nombre: "El abecedario o alfabeto", dificultad: 1),
+      Leccion(tema: "numeros", nombre: "Los números", dificultad: 1),
+      Leccion(tema: "dias_meses", nombre: "Los meses y días de la semana", dificultad: 1),
     ];
 
     return todasLasLecciones;
