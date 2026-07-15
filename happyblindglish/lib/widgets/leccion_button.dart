@@ -117,29 +117,50 @@ class _LeccionButtonState extends State<LeccionButton> {
       return;
     }
   
-    if (!mounted) return;
+    if (!mounted) return; 
     setState(() => _listening = true);
 
     // Anunciar que el micrófono está activado y que el usuario debe hablar ahora
-    await _flutterTts.setLanguage("es-MX");
     await Future.delayed(const Duration(milliseconds: 800));
-    
     if (!mounted) return;
 
     final targetWord = widget.palabra.palabraIngles.toLowerCase().trim();
     const double similarityThreshold = 0.3;
+    bool resultReceived = false;
+
+    Future.delayed(const Duration(seconds: 7), () {
+      if (!resultReceived && mounted && _listening) {
+        logger.w("Tiempo de escucha agotado sin resultado.");
+        _speechToText.stop();
+        setState(() => _listening = false);
+       
+        _flutterTts.setLanguage("es-MX");
+        _flutterTts.speak("No se captó la pronunciación. Intenta de nuevo.");
+        Vibration.vibrate(pattern: [0, 300, 200, 300]);
+      }
+    });
 
     _speechToText.listen(
       onResult: (result) async {
         if (!result.finalResult) return;
         if (!mounted) return;
 
+        resultReceived = true;
         await _speechToText.stop();
-
         setState(() => _listening = false);
 
         final recognizedPhrase = result.recognizedWords.toLowerCase().trim();
         logger.i("Frase reconocida: $recognizedPhrase");
+
+        // Si no reconoció nada
+        if (recognizedPhrase.isEmpty) {
+          logger.w("STT retornó string vacío.");
+          if (mounted) {
+            await _flutterTts.setLanguage("es-MX");
+            await _flutterTts.speak("No se captó la pronunciación. Intenta de nuevo.");
+          }
+          return;
+        }
 
         final wordsInPhrase = recognizedPhrase.split(" ");
         bool esCorrecto = false;
@@ -186,9 +207,10 @@ class _LeccionButtonState extends State<LeccionButton> {
         }
       },
 
-      listenFor: const Duration(seconds: 5),
-      pauseFor: const Duration(seconds: 3),
+      listenFor: const Duration(seconds: 6),
+      pauseFor: const Duration(seconds: 2),
       localeId: "en-US",
+      cancelOnError: true,
       onSoundLevelChange: (level) => logger.i("Nivel de sonido: $level"),
     );
   }
