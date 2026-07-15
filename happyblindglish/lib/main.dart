@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:happyblindglish/presentation/blocs/leccion_cubit.dart';
 import 'package:happyblindglish/presentation/blocs/reto_cubit.dart';
 import 'package:happyblindglish/presentation/blocs/tutorial_preference.dart';
-import 'package:happyblindglish/presentation/screens/challenges_main_screen.dart';
 import 'package:happyblindglish/presentation/screens/leccion_actividad_screen.dart';
 import 'package:happyblindglish/presentation/screens/lecciones_screen.dart';
 import 'package:happyblindglish/presentation/screens/onboarding_screen.dart';
@@ -102,15 +101,19 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    //LLENAMOS LA BASE DE DATOS
-    db.insertarBancoDePalabras();
+    if (!Platform.environment.containsKey('FLUTTER_TEST')) {
+      //LLENAMOS LA BASE DE DATOS
+      db.insertarBancoDePalabras();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      navigatorObservers: [rs.Observer()],
+      navigatorObservers: [
+        if (!Platform.environment.containsKey('FLUTTER_TEST')) rs.Observer(),
+      ],
       initialRoute: widget.isFirstLaunch ? "pantalla_inicial_tutorial" : "pantalla_principal",
       routes: {
         "reto_actividad_screen": (context) => const RetoActividadScreen(),
@@ -122,10 +125,10 @@ class _MyAppState extends State<MyApp> {
         "pantalla_mi_progreso": (context) => const ProgressScreen(
             text:
                 "En esta pantalla encontrarás 4 opciones: Un botón para escuchar cuantas palabras has aprendido, un botón para conocer tu puntaje, un botón para saber tu racha o cuantos días has jugado sin parar y finalmente el botón de regresar al menú"),
-        "pantalla_retos": (context) => const ChallengesMainScreen(
-              text:
-                  "En esta pantalla encontrarás 4 opciones: Un botón que te lleva a los retos para aprender las letras en ingles, un botón para hacerlo con palabras, un botón para hacerlo con frases y finalmente un botón de regreso",
-            ),
+        // "pantalla_retos": (context) => const ChallengesMainScreen(
+        //       text:
+        //           "En esta pantalla encontrarás 4 opciones: Un botón que te lleva a los retos para aprender las letras en ingles, un botón para hacerlo con palabras, un botón para hacerlo con frases y finalmente un botón de regreso",
+        //     ),
         "retos_del_dia": (context) => const RetosDelDiaScreen(),
         "lecciones_y_vocabulario": (context) => const LeccionesScreen(),
         "leccion_actividad_screen": (context) => const LeccionActividadScreen()

@@ -47,8 +47,6 @@ class _RetoActividadScreenState extends State<RetoActividadScreen> {
     super.dispose();
   }
 
-  RegExp regex = RegExp(r'¿Cómo se dice:\s*(.*)');
-
   List<PreguntaRespuestas> generarPreguntas(
     List<Palabra> banco,
   ) {

@@ -56,8 +56,8 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
     await _flutterTts.speak(palabraIngles);
   }
 
-  bool anotherEvent = false;
-  bool block = false;
+  // bool anotherEvent = false;
+  // bool block = false;
   // Future<void> _spellOut(String palabraIngles) async {
   //   _stopSpeech();
   //   block = true;
@@ -250,30 +250,30 @@ class _LeccionActividadScreenState extends State<LeccionActividadScreen> {
     );
   }
 
-  Widget _buildToggleButtons() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              showLearnedWords = false;
-            });
-          },
-          child: const Text("Palabras no aprendidas"),
-        ),
-        const SizedBox(width: 10),
-        ElevatedButton(
-          onPressed: () {
-            setState(() {
-              showLearnedWords = true;
-            });
-          },
-          child: const Text("Palabras aprendidas"),
-        ),
-      ],
-    );
-  }
+  // Widget _buildToggleButtons() {
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.center,
+  //     children: [
+  //       ElevatedButton(
+  //         onPressed: () {
+  //           setState(() {
+  //             showLearnedWords = false;
+  //           });
+  //         },
+  //         child: const Text("Palabras no aprendidas"),
+  //       ),
+  //       const SizedBox(width: 10),
+  //       ElevatedButton(
+  //         onPressed: () {
+  //           setState(() {
+  //             showLearnedWords = true;
+  //           });
+  //         },
+  //         child: const Text("Palabras aprendidas"),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Widget _buildWordList() {
     // Verificar si aún se están cargando las palabras

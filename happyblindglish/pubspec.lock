@@ -121,14 +121,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
-  dart_levenshtein:
-    dependency: "direct main"
-    description:
-      name: dart_levenshtein
-      sha256: f38182278b774cbb0d5993de50848e65da5a9f722b7f07787f0c26de009e0322
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
   device_info_plus:
     dependency: transitive
     description:
@@ -198,14 +190,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_accessibility_service:
-    dependency: "direct main"
-    description:
-      name: flutter_accessibility_service
-      sha256: "90936b3c45d78cf987cecb05503763a7a9daf6ed9781d1cc352100d91bdc0999"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.0"
   flutter_bloc:
     dependency: "direct main"
     description:
@@ -573,14 +557,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  smooth_page_indicator:
-    dependency: "direct main"
-    description:
-      name: smooth_page_indicator
-      sha256: b21ebb8bc39cf72d11c7cfd809162a48c3800668ced1c9da3aade13a32cf6c1c
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.1"
   source_span:
     dependency: transitive
     description:
